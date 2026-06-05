@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的待辦清單</title>
+    <style>
+        /* 簡單寫一點樣式，讓畫面稍微好看、清楚一點 */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            padding: 8px;
+        }
+
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>📝 我的待辦清單</h2>
+    <div class="input-group">
+        <input type="text" id="todo-input" placeholder="請輸入待辦事項...">
+        <button id="add-btn">新增</button>
+    </div>
+    <ul id="todo-list"></ul>
+   <script>
+        // 1. 抓取 HTML 元素 (DOM 操作)
+        const todoInput = document.getElementById('todo-input');
+        const addBtn = document.getElementById('add-btn');
+        const todoList = document.getElementById('todo-list');
+        // 2. 宣告一個陣列來管理資料
+        let todos = JSON.parse(localStorage.getItem('myTodos')) || [];
+
+        // 3. 負責把 todos 陣列渲染 (Render) 到畫面上的函式
+        function renderTodos() {
+            // 每次重新畫畫面之前，要把舊的清單內容清空，不然會重複重複一直印
+            todoList.innerHTML = '';
+
+            // 運用陣列的 forEach 方法，把每一條代辦事項拿出來處理
+            todos.forEach((todoObj, index) => {
+                // 建立一個新的 li 標籤
+                const li = document.createElement('li');
+                
+                // 1. 建立一個 span 標籤用來單獨包覆「文字」，這樣才不會連按鈕一起被劃掉
+                const textSpan = document.createElement('span');
+                textSpan.textContent = todoObj.text;
+
+                // 【核心改動】檢查這條事項是否已完成，如果是，就加上 CSS 刪除線
+                if (todoObj.completed) {
+                    textSpan.style.textDecoration = 'line-through'; // 加上刪除線
+                    textSpan.style.color = '#888';                // 讓顏色變淡一點
+                }
+
+                // 🌟【修正】必須先建立 btnGroup 容器，後面才能把按鈕塞進去！
+                const btnGroup = document.createElement('div');
+
+                // 2. 建立功能按鈕（我們把它改成「完成」按鈕）
+                const completeBtn = document.createElement('button');
+                // 根據狀態顯示不同的按鈕文字
+                completeBtn.textContent = todoObj.completed ? '未完成' : '完成';
+                completeBtn.style.marginRight = '5px'; // 讓兩個按鈕中間有一點空隙
+                completeBtn.className = 'complete-btn';
+                // 【核心改動】點擊按鈕時，切換完成狀態
+                completeBtn.addEventListener('click', () => {
+                    // 驚嘆號 ! 的意思是「反轉」：true 變成 false，false 變成 true
+                    todos[index].completed = !todos[index].completed; 
+                    
+                    saveToStorage(); // 狀態改變了，同步更新到 localStorage
+                    renderTodos();   // 重新渲染畫面
+                });
+
+                // 【按鈕二：真正刪除】
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '刪除';
+                deleteBtn.className = 'delete-btn'; // 使用原本紅色的樣式
+                
+                deleteBtn.addEventListener('click', () => {
+                    // 直接從陣列中拔掉這一筆資料
+                    todos.splice(index, 1); 
+                    saveToStorage(); // 同步更新到 localStorage
+                    renderTodos();   // 重新渲染畫面
+                });
+
+                // 4. 把兩個按鈕塞進按鈕容器裡
+                btnGroup.appendChild(completeBtn);
+                btnGroup.appendChild(deleteBtn);
+
+                // 3. 🌟【修正】把文字和「整個按鈕群組」依序塞進 li，再塞進 ul
+                li.appendChild(textSpan);
+                li.appendChild(btnGroup); // 這裡改成塞入 btnGroup，這樣兩個按鈕才會一起出現
+                todoList.appendChild(li);
+            });
+        }
+
+        addBtn.addEventListener('click', () => {
+            const text = todoInput.value.trim(); // 取得輸入框的值，並去掉前後空白
+            if (text === '') { return; }
+            todos.push({
+                text: text,
+                completed: false // 新增的事項預設都是「未完成」
+            });
+            saveToStorage();
+            renderTodos();    // 重新渲染畫面，讓新資料顯示出來
+            todoInput.value = ''; // 清空輸入框
+        });
+
+        // 寫一個專門用來存檔的函式
+        function saveToStorage() {
+            localStorage.setItem('myTodos', JSON.stringify(todos));
+        }
+
+        // 網頁一打開，自動執行一次渲染，把一開始載入的 local 舊資料畫出來
+        renderTodos();
+    </script>
+</body>
+
+</html>
