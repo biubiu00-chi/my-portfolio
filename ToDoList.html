@@ -1,138 +1,303 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
-    <meta charset="UTF-8">
-    <title>我的待辦清單</title>
-    <style>
-        /* 簡單寫一點樣式，讓畫面稍微好看、清楚一點 */
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 400px;
-            margin: 50px auto;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的待辦清單</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      --text-main: #333;
+      --tag-personal: #3b82f6;
+      --tag-work: #ef4444;
+    }
 
-        .input-group {
-            display: flex;
-            margin-bottom: 20px;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 50px;
+      margin: 0;
+    }
 
-        input {
-            flex: 1;
-            padding: 8px;
-        }
+    .todo-container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 480px;
+    }
 
-        button {
-            padding: 8px 15px;
-            cursor: pointer;
-        }
+    h2 {
+      margin-top: 0;
+      color: var(--text-main);
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
 
-        li {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            align-items: center;
-        }
-    </style>
+    /* 輸入區塊組合 */
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    select, input[type="text"] {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select {
+      background-color: #f8fafc;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      flex: 1;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    button.add-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button.add-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    /* 篩選標籤按鈕 */
+    .filter-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #edf2f7;
+      padding-bottom: 12px;
+    }
+
+    .filter-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* 待辦項目清單 */
+    .todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .todo-item:hover {
+      background: #f1f5f9;
+    }
+
+    .todo-item.completed span.todo-text {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    .todo-item input[type="checkbox"] {
+      margin-right: 12px;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    span.todo-text {
+      flex: 1;
+      font-size: 15px;
+      color: var(--text-main);
+    }
+
+    /* 分類標籤樣式 */
+    .category-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: white;
+      margin-right: 8px;
+      font-weight: bold;
+    }
+
+    .tag-personal { background-color: var(--tag-personal); }
+    .tag-work { background-color: var(--tag-work); }
+
+    /* 刪除按鈕 */
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.2s;
+    }
+
+    .delete-btn:hover {
+      color: #ef4444;
+    }
+  </style>
 </head>
-
 <body>
+
+  <div class="todo-container">
     <h2>📝 我的待辦清單</h2>
+    
     <div class="input-group">
-        <input type="text" id="todo-input" placeholder="請輸入待辦事項...">
-        <button id="add-btn">新增</button>
+      <select id="categorySelect">
+        <option value="personal">個人</option>
+        <option value="work">公司</option>
+      </select>
+      <input type="text" id="todoInput" placeholder="請輸入待辦事項...">
+      <button class="add-btn" onclick="addTodo()">新增</button>
     </div>
-    <ul id="todo-list"></ul>
-   <script>
-        // 1. 抓取 HTML 元素 (DOM 操作)
-        const todoInput = document.getElementById('todo-input');
-        const addBtn = document.getElementById('add-btn');
-        const todoList = document.getElementById('todo-list');
-        // 2. 宣告一個陣列來管理資料
-        let todos = JSON.parse(localStorage.getItem('myTodos')) || [];
 
-        // 3. 負責把 todos 陣列渲染 (Render) 到畫面上的函式
-        function renderTodos() {
-            // 每次重新畫畫面之前，要把舊的清單內容清空，不然會重複重複一直印
-            todoList.innerHTML = '';
+    <div class="filter-tags">
+      <button class="filter-btn active" onclick="filterTodo('all', this)">全部</button>
+      <button class="filter-btn" onclick="filterTodo('active', this)">未完成</button>
+      <button class="filter-btn" onclick="filterTodo('completed', this)">已完成</button>
+    </div>
 
-            // 運用陣列的 forEach 方法，把每一條代辦事項拿出來處理
-            todos.forEach((todoObj, index) => {
-                // 建立一個新的 li 標籤
-                const li = document.createElement('li');
-                
-                // 1. 建立一個 span 標籤用來單獨包覆「文字」，這樣才不會連按鈕一起被劃掉
-                const textSpan = document.createElement('span');
-                textSpan.textContent = todoObj.text;
+    <ul class="todo-list" id="todoList">
+      <li class="todo-item" data-category="personal" data-status="active">
+        <input type="checkbox" onchange="toggleComplete(this)">
+        <span class="category-tag tag-personal">個人</span>
+        <span class="todo-text">記得運動 30 分鐘</span>
+        <button class="delete-btn" onclick="deleteTodo(this)">✕</button>
+      </li>
+      <li class="todo-item" data-category="work" data-status="active">
+        <input type="checkbox" onchange="toggleComplete(this)">
+        <span class="category-tag tag-work">公司</span>
+        <span class="todo-text">準備下午 3 點的週會簡報</span>
+        <button class="delete-btn" onclick="deleteTodo(this)">✕</button>
+      </li>
+    </ul>
+  </div>
 
-                // 【核心改動】檢查這條事項是否已完成，如果是，就加上 CSS 刪除線
-                if (todoObj.completed) {
-                    textSpan.style.textDecoration = 'line-through'; // 加上刪除線
-                    textSpan.style.color = '#888';                // 讓顏色變淡一點
-                }
+  <script>
+    const todoInput = document.getElementById('todoInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const todoList = document.getElementById('todoList');
+    let currentFilter = 'all';
 
-                // 🌟【修正】必須先建立 btnGroup 容器，後面才能把按鈕塞進去！
-                const btnGroup = document.createElement('div');
+    // 新增待辦事項
+    function addTodo() {
+      const text = todoInput.value.trim();
+      if (!text) return alert('請輸入內容！');
 
-                // 2. 建立功能按鈕（我們把它改成「完成」按鈕）
-                const completeBtn = document.createElement('button');
-                // 根據狀態顯示不同的按鈕文字
-                completeBtn.textContent = todoObj.completed ? '未完成' : '完成';
-                completeBtn.style.marginRight = '5px'; // 讓兩個按鈕中間有一點空隙
-                completeBtn.className = 'complete-btn';
-                // 【核心改動】點擊按鈕時，切換完成狀態
-                completeBtn.addEventListener('click', () => {
-                    // 驚嘆號 ! 的意思是「反轉」：true 變成 false，false 變成 true
-                    todos[index].completed = !todos[index].completed; 
-                    
-                    saveToStorage(); // 狀態改變了，同步更新到 localStorage
-                    renderTodos();   // 重新渲染畫面
-                });
+      const category = categorySelect.value;
+      const categoryText = category === 'personal' ? '個人' : '公司';
+      const tagClass = category === 'personal' ? 'tag-personal' : 'tag-work';
 
-                // 【按鈕二：真正刪除】
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = '刪除';
-                deleteBtn.className = 'delete-btn'; // 使用原本紅色的樣式
-                
-                deleteBtn.addEventListener('click', () => {
-                    // 直接從陣列中拔掉這一筆資料
-                    todos.splice(index, 1); 
-                    saveToStorage(); // 同步更新到 localStorage
-                    renderTodos();   // 重新渲染畫面
-                });
+      const li = document.createElement('li');
+      li.className = 'todo-item';
+      li.setAttribute('data-category', category);
+      li.setAttribute('data-status', 'active');
 
-                // 4. 把兩個按鈕塞進按鈕容器裡
-                btnGroup.appendChild(completeBtn);
-                btnGroup.appendChild(deleteBtn);
+      li.innerHTML = `
+        <input type="checkbox" onchange="toggleComplete(this)">
+        <span class="category-tag ${tagClass}">${categoryText}</span>
+        <span class="todo-text">${text}</span>
+        <button class="delete-btn" onclick="deleteTodo(this)">✕</button>
+      `;
 
-                // 3. 🌟【修正】把文字和「整個按鈕群組」依序塞進 li，再塞進 ul
-                li.appendChild(textSpan);
-                li.appendChild(btnGroup); // 這裡改成塞入 btnGroup，這樣兩個按鈕才會一起出現
-                todoList.appendChild(li);
-            });
+      todoList.appendChild(li);
+      todoInput.value = ''; // 清空輸入框
+      
+      // 根據當前篩選狀態決定是否隱藏新項目
+      applyFilter();
+    }
+
+    // 切換完成狀態
+    function toggleComplete(checkbox) {
+      const item = checkbox.parentElement;
+      if (checkbox.checked) {
+        item.classList.add('completed');
+        item.setAttribute('data-status', 'completed');
+      } else {
+        item.classList.remove('completed');
+        item.setAttribute('data-status', 'active');
+      }
+      applyFilter();
+    }
+
+    // 刪除項目
+    function deleteTodo(button) {
+      button.parentElement.remove();
+    }
+
+    // 點擊篩選標籤
+    function filterTodo(status, btnElement) {
+      // 切換按鈕 active 樣式
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+      
+      currentFilter = status;
+      applyFilter();
+    }
+
+    // 執行篩選邏輯
+    function applyFilter() {
+      const items = document.querySelectorAll('.todo-item');
+      items.forEach(item => {
+        const status = item.getAttribute('data-status');
+        
+        if (currentFilter === 'all') {
+          item.style.display = 'flex';
+        } else if (currentFilter === 'active' && status === 'active') {
+          item.style.display = 'flex';
+        } else if (currentFilter === 'completed' && status === 'completed') {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
         }
+      });
+    }
 
-        addBtn.addEventListener('click', () => {
-            const text = todoInput.value.trim(); // 取得輸入框的值，並去掉前後空白
-            if (text === '') { return; }
-            todos.push({
-                text: text,
-                completed: false // 新增的事項預設都是「未完成」
-            });
-            saveToStorage();
-            renderTodos();    // 重新渲染畫面，讓新資料顯示出來
-            todoInput.value = ''; // 清空輸入框
-        });
-
-        // 寫一個專門用來存檔的函式
-        function saveToStorage() {
-            localStorage.setItem('myTodos', JSON.stringify(todos));
-        }
-
-        // 網頁一打開，自動執行一次渲染，把一開始載入的 local 舊資料畫出來
-        renderTodos();
-    </script>
+    // 支援按下 Enter 鍵新增
+    todoInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addTodo();
+    });
+  </script>
 </body>
-
 </html>
