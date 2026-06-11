@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寶可夢對戰戰略圖鑑</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: '-apple-system', BlinkMacSystemFont, "Segoe UI", Roboto, 'PingFang TC', sans-serif;
+            background: linear-gradient(135deg, rgba(15, 22, 38, 0.9), rgba(30, 41, 67, 0.95)),
+                        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #f5f6fa;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .pokemo {
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-shadow: 0 0 15px rgba(255, 222, 0, 0.4);
+        }
+
+        .pokemo span {
+            color: #ffde00;
+            -webkit-text-stroke: 1px #3b4cca;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #search {
+            flex: 1;
+            height: 48px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 0 25px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+
+        #search:focus {
+            border-color: #ffde00;
+            box-shadow: 0 0 15px rgba(255, 222, 0, 0.3);
+        }
+
+        #search-btn, .back-btn {
+            height: 48px;
+            padding: 0 25px;
+            background: linear-gradient(135deg, #ffde00, #ffa500);
+            color: #141821;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
+            transition: all 0.2s;
+        }
+
+        #search-btn:hover, .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 222, 0, 0.5);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #f3f4f6, #d1d5db);
+            color: #1f2937;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .typ {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            max-width: 1100px;
+            margin: 0 auto 30px auto;
+        }
+
+        @media (max-width: 900px) { .typ { grid-template-columns: repeat(5, 1fr); } }
+        @media (max-width: 500px) { .typ { grid-template-columns: repeat(3, 1fr); } }
+
+        .typ button {
+            padding: 8px 12px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .typ button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .typ button.active {
+            border-color: #fff;
+            box-shadow: 0 0 12px #fff;
+        }
+
+        .main-layout {
+            max-width: 1300px;
+            margin: 0 auto;
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .list-section {
+            width: 100%;
+        }
+
+        .detail-section {
+            display: none; 
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: flex-start; 
+            justify-content: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .focus-card-wrapper {
+            flex: 1;
+            min-width: 320px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .focus-card {
+            text-align: center;
+            border: 2px solid rgba(255, 222, 0, 0.3);
+        }
+
+        .focus-card img {
+            width: 220px;
+            height: 220px;
+            filter: drop-shadow(0 12px 20px rgba(0,0,0,0.4));
+        }
+
+        .focus-card .name {
+            font-size: 32px;
+            margin: 15px 0;
+            color: #ffde00;
+            text-transform: uppercase;
+        }
+
+        /* 新增：種族值數據列 */
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .stat-label {
+            width: 50px;
+            color: #ccc;
+            text-align: left;
+        }
+
+        .stat-bar-bg {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            height: 10px;
+            border-radius: 5px;
+            margin: 0 12px;
+            overflow: hidden;
+        }
+
+        .stat-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-bar.hp    { background: linear-gradient(90deg, #ff5959, #ff7474); }
+        .stat-bar.atk   { background: linear-gradient(90deg, #f5ac78, #fbc093); }
+        .stat-bar.def   { background: linear-gradient(90deg, #fae078, #fbe69e); }
+        .stat-bar.spatk { background: linear-gradient(90deg, #9db7f5, #b0c7fb); }
+        .stat-bar.spdef { background: linear-gradient(90deg, #a7db8d, #c1e7ac); }
+        .stat-bar.spd   { background: linear-gradient(90deg, #fa92b2, #fbb1c9); }
+
+        .stat-val {
+            width: 30px;
+            text-align: right;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .total-row {
+            margin-top: 5px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            justify-content: space-between;
+        }
+
+        .stat-val-total {
+            color: #ffde00;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .info-box-wrapper {
+            flex: 1.8;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-sub-panel h3 {
+            color: #ffde00;
+            font-size: 18px;
+            margin-bottom: 12px;
+            border-left: 4px solid #ffde00;
+            padding-left: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .skills-container, .weakness-container, .abilities-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .skill-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+            text-transform: capitalize;
+        }
+
+        /* 新增：特性標籤樣式 */
+        .ability-badge {
+            background: rgba(42, 46, 61, 0.7);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-transform: capitalize;
+        }
+
+        .ability-badge.hidden-ability {
+            border-color: #fa92b2;
+            color: #fbb1c9;
+            background: rgba(250, 146, 178, 0.1);
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .cards {
+            width: 160px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            border-radius: 20px;
+            padding: 18px 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .cards:hover {
+            transform: translateY(-5px);
+            border-color: #ffde00;
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 8px 25px rgba(255, 222, 0, 0.25);
+        }
+
+        .num {
+            font-size: 13px;
+            color: #ccc;
+            font-weight: bold;
+        }
+
+        .cards img {
+            width: 95px;
+            height: 95px;
+            object-fit: contain;
+        }
+
+        .name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+            text-transform: capitalize;
+        }
+
+        .type {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .type-badge {
+            padding: 3px 10px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="pokemo" id="logo">寶可夢<span>戰略圖鑑</span></div>
+        <div class="search-container">
+            <input id="search" type="text" placeholder="輸入名稱或編號 (如: 1 或 pikachu)">
+            <button id="search-btn" type="button">搜尋</button>
+        </div>
+    </div>
+
+    <div class="typ" id="type-tags-container">
+        <button class="active" style="background-color: #4a5568;" data-type="all">全部屬性</button>
+    </div>
+
+    <div style="text-align: center;">
+        <button class="back-btn" id="back-btn">← 返回大集合列表</button>
+    </div>
+
+    <div class="main-layout">
+        <div class="list-section" id="list-section">
+            <div class="container" id="main-list-container"></div>
+        </div>
+
+        <div class="detail-section" id="detail-section">
+            <div class="focus-card-wrapper">
+                <div class="focus-card glass-panel" id="focus-card-target"></div>
+                
+                <div class="glass-panel" style="padding: 20px;">
+                    <div class="stats-container">
+                        <div class="stat-row"><span class="stat-label">HP</span><div class="stat-bar-bg"><div class="stat-bar hp"></div></div><span class="stat-val" id="stat-hp">0</span></div>
+                        <div class="stat-row"><span class="stat-label">攻擊</span><div class="stat-bar-bg"><div class="stat-bar atk"></div></div><span class="stat-val" id="stat-atk">0</span></div>
+                        <div class="stat-row"><span class="stat-label">防禦</span><div class="stat-bar-bg"><div class="stat-bar def"></div></div><span class="stat-val" id="stat-def">0</span></div>
+                        <div class="stat-row"><span class="stat-label">特攻</span><div class="stat-bar-bg"><div class="stat-bar spatk"></div></div><span class="stat-val" id="stat-spatk">0</span></div>
+                        <div class="stat-row"><span class="stat-label">特防</span><div class="stat-bar-bg"><div class="stat-bar spdef"></div></div><span class="stat-val" id="stat-spdef">0</span></div>
+                        <div class="stat-row"><span class="stat-label">速度</span><div class="stat-bar-bg"><div class="stat-bar spd"></div></div><span class="stat-val" id="stat-spd">0</span></div>
+                        <div class="stat-row total-row"><span class="stat-label" style="color: #ffde00; font-weight: bold;">總和</span><span class="stat-val-total" id="stat-total">0</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-box-wrapper glass-panel">
+                <div class="info-sub-panel">
+                    <h3>特性 (Abilities)</h3>
+                    <div class="abilities-container" id="abilities-container"></div>
+                </div>
+
+                <div class="info-sub-panel">
+                    <h3>精選推薦招式 (Moves)</h3>
+                    <div class="skills-container" id="skills-container"></div>
+                </div>
+                
+                <div class="info-sub-panel">
+                    <h3>雙倍弱點相剋屬性 (Weaknesses)</h3>
+                    <div class="weakness-container" id="weakness-container"></div>
+                </div>
+
+                <div class="info-sub-panel">
+                    <h3>完整生態進化鏈（含退化/進化型態）</h3>
+                    <div class="container" id="evolution-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const mainListContainer = document.getElementById("main-list-container");
+    const typeTagsContainer = document.getElementById("type-tags-container");
+    const searchInput = document.getElementById("search");
+    const searchBtn = document.getElementById("search-btn");
+    const backBtn = document.getElementById("back-btn");
+    
+    const listSection = document.getElementById("list-section");
+    const detailSection = document.getElementById("detail-section");
+    const focusCardTarget = document.getElementById("focus-card-target");
+    const evolutionContainer = document.getElementById("evolution-container");
+    const skillsContainer = document.getElementById("skills-container");
+    const weaknessContainer = document.getElementById("weakness-container");
+    const abilitiesContainer = document.getElementById("abilities-container");
+    const logo = document.getElementById("logo");
+
+    const pokemonList = [];
+
+    const Types = {
+        "normal": { "zh": "一般", "color": "#A8A77A", "weakTo": ["fighting"] },
+        "fighting": { "zh": "格鬥", "color": "#C22E28", "weakTo": ["flying", "psychic", "fairy"] },
+        "flying": { "zh": "飛行", "color": "#A98FF3", "weakTo": ["electric", "ice", "rock"] },
+        "poison": { "zh": "毒", "color": "#A33EA1", "weakTo": ["ground", "psychic"] },
+        "ground": { "zh": "地面", "color": "#E2BF65", "weakTo": ["water", "grass", "ice"] },
+        "rock": { "zh": "岩石", "color": "#B6A136", "weakTo": ["water", "grass", "fighting", "ground", "steel"] },
+        "bug": { "zh": "蟲", "color": "#A6B91A", "weakTo": ["fire", "flying", "rock"] },
+        "ghost": { "zh": "幽靈", "color": "#735797", "weakTo": ["ghost", "dark"] },
+        "steel": { "zh": "鋼", "color": "#B7B7CE", "weakTo": ["fire", "fighting", "ground"] },
+        "fire": { "zh": "火", "color": "#EE8130", "weakTo": ["water", "ground", "rock"] },
+        "water": { "zh": "水", "color": "#6390F0", "weakTo": ["grass", "electric"] },
+        "grass": { "zh": "草", "color": "#7AC74C", "weakTo": ["fire", "ice", "poison", "flying", "bug"] },
+        "electric": { "zh": "電", "color": "#F7D02C", "weakTo": ["ground"] },
+        "psychic": { "zh": "超能力", "color": "#F95587", "weakTo": ["bug", "ghost", "dark"] },
+        "ice": { "zh": "冰", "color": "#96D9D6", "weakTo": ["fire", "fighting", "rock", "steel"] },
+        "dragon": { "zh": "龍", "color": "#6F35FC", "weakTo": ["ice", "dragon", "fairy"] },
+        "dark": { "zh": "惡", "color": "#705746", "weakTo": ["fighting", "bug", "fairy"] },
+        "fairy": { "zh": "妖精", "color": "#D685AD", "weakTo": ["poison", "steel"] }
+    };
+
+    // 常用對戰熱門特性中譯對照表
+    const AbilityTranslations = {
+        "overgrow": "茂盛", "chlorophyll": "葉綠素", "blaze": "猛火", "solar-power": "太陽之力",
+        "torrent": "激流", "rain-dish": "雨盤", "shield-dust": "鱗粉", "run-away": "逃跑",
+        "shed-skin": "蜕皮", "compound-eyes": "複眼", "tinted-lens": "有色眼鏡", "swarm": "蟲之預感",
+        "sniper": "狙擊手", "keen-eye": "銳利目光", "tangled-feet": "踉蹌步履", "big-pecks": "健壯胸肌",
+        "guts": "毅力", "intimidate": "威嚇", "static": "靜電", "lightning-rod": "避雷針",
+        "sand-veil": "沙隱", "rough-skin": "粗糙皮膚", "sheer-force": "強行", "cute-charm": "迷人",
+        "magic-guard": "魔法防守", "flash-fire": "引火", "drought": "日照", "levitate": "飄浮"
+    };
+
+    function initTypeButtons() {
+        Object.keys(Types).forEach(engName => {
+            const btn = document.createElement("button");
+            btn.textContent = Types[engName].zh;
+            btn.style.backgroundColor = Types[engName].color;
+            btn.setAttribute("data-type", engName);
+            typeTagsContainer.appendChild(btn);
+        });
+    }
+
+    initTypeButtons();
+
+    fetch('https://pokeapi.co/api/v2/pokemon?limit=2000&offset=0')
+        .then(res => res.json())
+        .then(data => {
+            const detailRequests = data.results.map(p => fetch(p.url).then(res => res.json()));
+            return Promise.all(detailRequests);
+        })
+        .then(allDetails => {
+            pokemonList.push(...allDetails);
+            renderList(pokemonList);
+        });
+
+    function renderList(data) {
+        mainListContainer.innerHTML = '';
+        data.forEach(pokemon => {
+            const card = createCardHtml(pokemon);
+            card.addEventListener('click', () => switchToDetailMode(pokemon));
+            mainListContainer.appendChild(card);
+        });
+    }
+
+    function createCardHtml(element, isBig = false) {
+        const nameValue = element.name;
+        const idValue = String(element.id).padStart(3, '0');
+        const imgUrl = element.sprites.other['official-artwork'].front_default || element.sprites.front_default;
+        
+        const typeHtml = element.types.map(t => {
+            const engName = t.type.name;
+            const zhName = Types[engName] ? Types[engName].zh : engName;
+            const color = Types[engName] ? Types[engName].color : "#ccc";
+            return `<span class="type-badge" style="background-color: ${color};">${zhName}</span>`;
+        }).join(' ');
+
+        const card = document.createElement('div');
+        card.className = 'cards';
+        if(isBig) card.style.width = "100%";
+        
+        card.innerHTML = `
+            <div class="num">#${idValue}</div>
+            <img src="${imgUrl}" alt="${nameValue}">
+            <div class="name">${nameValue}</div>
+            <div class="type">${typeHtml}</div> 
+        `;
+        return card;
+    }
+
+    // 切換成【單隻垂直置中詳情模式】
+    function switchToDetailMode(pokemon) {
+        listSection.style.display = "none";
+        typeTagsContainer.style.display = "none";
+        backBtn.style.display = "inline-block";
+        detailSection.style.display = "flex"; 
+
+        focusCardTarget.innerHTML = '';
+        focusCardTarget.appendChild(createCardHtml(pokemon, true));
+
+        // 新增：渲染特性 (Abilities)
+        abilitiesContainer.innerHTML = '';
+        pokemon.abilities.forEach(a => {
+            const badge = document.createElement('span');
+            const engName = a.ability.name;
+            const zhName = AbilityTranslations[engName] || engName.replace('-', ' ');
+            
+            badge.className = 'ability-badge';
+            if (a.is_hidden) {
+                badge.classList.add('hidden-ability');
+                badge.innerHTML = `${zhName} <small style="font-size:10px;">[夢特]</small>`;
+            } else {
+                badge.textContent = zhName;
+            }
+            abilitiesContainer.appendChild(badge);
+        });
+
+        // 新增：渲染種族值 (Base Stats)
+        const statKeys = ['hp', 'atk', 'def', 'spatk', 'spdef', 'spd'];
+        let totalStats = 0;
+        
+        pokemon.stats.forEach((s, idx) => {
+            const baseValue = s.base_stat;
+            totalStats += baseValue;
+            
+            // 填入數值文字
+            document.getElementById(`stat-${statKeys[idx]}`).textContent = baseValue;
+            
+            // 計算並更新進度條長度 (單項上限設定為 200 作為分母計算比例)
+            const percent = Math.min((baseValue / 200) * 100, 100);
+            const bar = document.querySelector(`.stat-bar.${statKeys[idx]}`);
+            if (bar) {
+                // 延遲一下讓轉場動畫更順暢
+                setTimeout(() => {
+                    bar.style.width = `${percent}%`;
+                }, 50);
+            }
+        });
+        document.getElementById('stat-total').textContent = totalStats;
+
+        // 隨機推薦4個招式技能
+        skillsContainer.innerHTML = '';
+        const moves = pokemon.moves.sort(() => 0.5 - Math.random()).slice(0, 4);
+        moves.forEach(m => {
+            const badge = document.createElement('span');
+            badge.className = 'skill-badge';
+            badge.textContent = m.move.name.replace('-', ' ');
+            skillsContainer.appendChild(badge);
+        });
+
+        // 屬性相剋雙倍弱點計算
+        weaknessContainer.innerHTML = '';
+        let weaknesses = [];
+        pokemon.types.forEach(t => {
+            const typeInfo = Types[t.type.name];
+            if (typeInfo && typeInfo.weakTo) weaknesses.push(...typeInfo.weakTo);
+        });
+        weaknesses = [...new Set(weaknesses)];
+        weaknesses.forEach(w => {
+            const wBadge = document.createElement('span');
+            wBadge.className = 'type-badge';
+            wBadge.style.backgroundColor = Types[w].color;
+            wBadge.style.padding = "5px 12px";
+            wBadge.textContent = Types[w].zh;
+            weaknessContainer.appendChild(wBadge);
+        });
+
+        fetchEvolutionChain(pokemon.id);
+    }
+
+    // 切換回【大集合總列表模式】
+    function switchToGridMode() {
+        listSection.style.display = "block";
+        typeTagsContainer.style.display = "grid"; 
+        backBtn.style.display = "none";
+        detailSection.style.display = "none"; 
+        searchInput.value = "";
+        
+        // 重設所有進度條為 0% 方便下次進場動畫觸發
+        document.querySelectorAll('.stat-bar').forEach(bar => bar.style.width = '0%');
+        
+        renderList(pokemonList);
+    }
+
+    function handleSearch() {
+        const query = searchInput.value.trim().toLowerCase();
+        if (query === "") { switchToGridMode(); return; }
+
+        const matched = pokemonList.find(p => p.name.toLowerCase() === query || String(p.id) === query || String(p.id).padStart(3, '0') === query);
+
+        if (matched) {
+            switchToDetailMode(matched);
+        } else {
+            fetch(`https://pokeapi.co/api/v2/pokemon/${query}`)
+                .then(res => { if(!res.ok) throw new Error(); return res.json(); })
+                .then(onlinePokemon => switchToDetailMode(onlinePokemon))
+                .catch(() => alert("精靈資料庫中查無此項目，請確認輸入是否有誤！"));
+        }
+    }
+
+    function fetchEvolutionChain(pokemonId) {
+        evolutionContainer.innerHTML = '<p style="color:#ccc;">生態進化數據同步中...</p>';
+        fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`)
+            .then(res => res.json())
+            .then(speciesData => fetch(speciesData.evolution_chain.url))
+            .then(res => res.json())
+            .then(chainData => {
+                const allEvoNames = [];
+                function traverseChain(stage) {
+                    if (!stage) return;
+                    allEvoNames.push(stage.species.name);
+                    if (stage.evolves_to) stage.evolves_to.forEach(next => traverseChain(next));
+                }
+                traverseChain(chainData.chain);
+
+                const requests = allEvoNames.map(name => fetch(`https://pokeapi.co/api/v2/pokemon/${name}`).then(res => res.json()).catch(() => null));
+                return Promise.all(requests);
+            })
+            .then(evoPokemons => {
+                evolutionContainer.innerHTML = '';
+                evoPokemons.filter(p => p !== null).forEach(evoUnit => {
+                    const evoCard = createCardHtml(evoUnit);
+                    evoCard.addEventListener('click', () => switchToDetailMode(evoUnit));
+                    evolutionContainer.appendChild(evoCard);
+                });
+            })
+            .catch(() => {
+                evolutionContainer.innerHTML = '<p style="color:#aaa;">無型態轉換數據</p>';
+            });
+    }
+
+    searchBtn.addEventListener("click", handleSearch);
+    searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") handleSearch(); });
+    backBtn.addEventListener("click", switchToGridMode);
+    logo.addEventListener("click", switchToGridMode);
+
+    typeTagsContainer.addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON") return;
+        document.querySelectorAll(".typ button").forEach(b => b.classList.remove("active"));
+        e.target.classList.add("active");
+
+        const selectedType = e.target.getAttribute("data-type");
+        if (selectedType === "all") {
+            renderList(pokemonList);
+        } else {
+            renderList(pokemonList.filter(p => p.types.some(t => t.type.name === selectedType)));
+        }
+    });
+</script>
+</body>
+
+</html>
