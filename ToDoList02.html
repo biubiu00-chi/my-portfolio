@@ -10,8 +10,6 @@
       --primary-hover: #4338ca;
       --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       --text-main: #333;
-      --tag-personal: #3b82f6;
-      --tag-work: #ef4444;
     }
 
     body {
@@ -21,7 +19,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding-top: 50px;
+      padding: 50px 0;
       margin: 0;
     }
 
@@ -31,7 +29,7 @@
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       width: 100%;
-      max-width: 480px;
+      max-width: 520px;
     }
 
     h2 {
@@ -39,17 +37,94 @@
       color: var(--text-main);
       text-align: center;
       font-size: 24px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* 分類管理區塊 */
+    .category-manager {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px dashed #cbd5e1;
+    }
+    .category-manager h4 {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .cat-input-group {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .cat-input-group input[type="text"] {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+    .cat-input-group input[type="color"] {
+      border: none;
+      width: 35px;
+      height: 33px;
+      cursor: pointer;
+      background: transparent;
+    }
+    .cat-btn {
+      background: #64748b;
+      color: white;
+      border: none;
+      padding: 0 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* 新增：自訂分類標籤管理清單 */
+    .custom-tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .manage-tag-item {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      padding: 2px 6px 2px 8px;
+      border-radius: 4px;
+      color: white;
+      font-weight: bold;
+    }
+    .manage-tag-del {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 11px;
+      margin-left: 4px;
+      padding: 0 2px;
+    }
+    .manage-tag-del:hover {
+      color: white;
     }
 
     /* 輸入區塊組合 */
     .input-group {
       display: flex;
+      flex-direction: column;
       gap: 8px;
       margin-bottom: 16px;
     }
+    .input-row-1 {
+      display: flex;
+      gap: 8px;
+    }
+    .input-row-2 {
+      display: flex;
+      gap: 8px;
+    }
 
-    select, input[type="text"] {
+    select, input[type="text"], input[type="date"] {
       padding: 12px;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -61,13 +136,18 @@
     select {
       background-color: #f8fafc;
       cursor: pointer;
+      min-width: 90px;
     }
 
     input[type="text"] {
       flex: 1;
     }
+    input[type="date"] {
+      flex: 1;
+      color: #64748b;
+    }
 
-    select:focus, input[type="text"]:focus {
+    select:focus, input[type="text"]:focus, input[type="date"]:focus {
       border-color: var(--primary);
     }
 
@@ -86,7 +166,17 @@
       background: var(--primary-hover);
     }
 
-    /* 篩選標籤按鈕 */
+    /* 搜尋框與篩選標籤 */
+    .search-box {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      font-size: 13px;
+    }
+
     .filter-tags {
       display: flex;
       gap: 8px;
@@ -150,6 +240,17 @@
       color: var(--text-main);
     }
 
+    /* 截止日期樣式 */
+    .due-date-tag {
+      font-size: 12px;
+      color: #64748b;
+      margin-right: 12px;
+    }
+    .due-urgent {
+      color: #ef4444 !important;
+      font-weight: bold;
+    }
+
     /* 分類標籤樣式 */
     .category-tag {
       font-size: 11px;
@@ -159,9 +260,6 @@
       margin-right: 8px;
       font-weight: bold;
     }
-
-    .tag-personal { background-color: var(--tag-personal); }
-    .tag-work { background-color: var(--tag-work); }
 
     /* 刪除按鈕 */
     .delete-btn {
@@ -183,14 +281,31 @@
   <div class="todo-container">
     <h2>📝 我的待辦清單</h2>
     
-    <div class="input-group">
-      <select id="categorySelect">
-        <option value="personal">個人</option>
-        <option value="work">公司</option>
-      </select>
-      <input type="text" id="todoInput" placeholder="請輸入待辦事項...">
-      <button class="add-btn" onclick="addTodo()">新增</button>
+    <div class="category-manager">
+      <h4>➕ 新增與管理自訂分類</h4>
+      <div class="cat-input-group">
+        <input type="text" id="newCatName" placeholder="分類名稱（如：學習）">
+        <input type="color" id="newCatColor" value="#3b82f6">
+        <button class="cat-btn" onclick="addCustomCategory()">新增分類</button>
+      </div>
+      <div class="custom-tags-list" id="customTagsList"></div>
     </div>
+
+    <div class="input-group">
+      <div class="input-row-1">
+        <select id="categorySelect">
+          <option value="personal" data-color="#3b82f6">個人</option>
+          <option value="work" data-color="#ef4444">公司</option>
+        </select>
+        <input type="text" id="todoInput" placeholder="請輸入待辦事項...">
+      </div>
+      <div class="input-row-2">
+        <input type="date" id="dueDateInput" title="設定截止日期">
+        <button class="add-btn" onclick="addTodo()">新增</button>
+      </div>
+    </div>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 搜尋待辦事項..." oninput="applyFilter()">
 
     <div class="filter-tags">
       <button class="filter-btn active" onclick="filterTodo('all', this)">全部</button>
@@ -201,14 +316,16 @@
     <ul class="todo-list" id="todoList">
       <li class="todo-item" data-category="personal" data-status="active">
         <input type="checkbox" onchange="toggleComplete(this)">
-        <span class="category-tag tag-personal">個人</span>
-        <span class="todo-text">記得運動 30 分鐘</span>
+        <span class="category-tag" style="background-color: #3b82f6;">個人</span>
+        <span class="todo-text" ondblclick="editTodo(this)" title="雙擊可編輯文字">記得運動 30 分鐘</span>
+        <span class="due-date-tag"></span>
         <button class="delete-btn" onclick="deleteTodo(this)">✕</button>
       </li>
       <li class="todo-item" data-category="work" data-status="active">
         <input type="checkbox" onchange="toggleComplete(this)">
-        <span class="category-tag tag-work">公司</span>
-        <span class="todo-text">準備下午 3 點的週會簡報</span>
+        <span class="category-tag" style="background-color: #ef4444;">公司</span>
+        <span class="todo-text" ondblclick="editTodo(this)" title="雙擊可編輯文字">準備下午 3 點的週會簡報</span>
+        <span class="due-date-tag"></span>
         <button class="delete-btn" onclick="deleteTodo(this)">✕</button>
       </li>
     </ul>
@@ -217,35 +334,164 @@
   <script>
     const todoInput = document.getElementById('todoInput');
     const categorySelect = document.getElementById('categorySelect');
+    const dueDateInput = document.getElementById('dueDateInput');
+    const searchInput = document.getElementById('searchInput');
     const todoList = document.getElementById('todoList');
+    const customTagsList = document.getElementById('customTagsList');
     let currentFilter = 'all';
+
+    // 網頁載入時，還原 LocalStorage 中的狀態
+    const savedHtml = localStorage.getItem('myTodoListHtml');
+    if (savedHtml) {
+      todoList.innerHTML = savedHtml;
+    }
+    const savedCategories = localStorage.getItem('myTodoCategoriesHtml');
+    if (savedCategories) {
+      categorySelect.innerHTML = savedCategories;
+    }
+    const savedTagsList = localStorage.getItem('myCustomTagsListHtml');
+    if (savedTagsList) {
+      customTagsList.innerHTML = savedTagsList;
+    }
+
+    // 檢查日期過期
+    function checkDateUrgency() {
+      const items = document.querySelectorAll('.todo-item');
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      items.forEach(item => {
+        const dateTag = item.querySelector('.due-date-tag');
+        if (dateTag && dateTag.getAttribute('data-date')) {
+          const itemDate = dateTag.getAttribute('data-date');
+          if (itemDate <= todayStr && item.getAttribute('data-status') === 'active') {
+            dateTag.classList.add('due-urgent');
+          } else {
+            dateTag.classList.remove('due-urgent');
+          }
+        }
+      });
+    }
+
+    // 新增自訂分類
+    function addCustomCategory() {
+      const nameInput = document.getElementById('newCatName');
+      const colorInput = document.getElementById('newCatColor');
+      const name = nameInput.value.trim();
+      
+      if (!name) return alert('請輸入分類名稱！');
+
+      const options = Array.from(categorySelect.options);
+      if (options.some(opt => opt.text === name)) {
+        return alert('此分類已存在！');
+      }
+
+      const categoryValue = 'custom_' + Date.now();
+      const color = colorInput.value;
+
+      // 1. 加到下拉選單
+      const option = document.createElement('option');
+      option.value = categoryValue;
+      option.text = name;
+      option.setAttribute('data-color', color);
+      categorySelect.appendChild(option);
+
+      // 2. 加到管理面板清單（帶有刪除按鈕）
+      const tagSpan = document.createElement('span');
+      tagSpan.className = 'manage-tag-item';
+      tagSpan.style.backgroundColor = color;
+      tagSpan.setAttribute('data-val', categoryValue);
+      tagSpan.innerHTML = `${name} <button class="manage-tag-del" onclick="deleteCustomCategory('${categoryValue}', this)">✕</button>`;
+      customTagsList.appendChild(tagSpan);
+
+      nameInput.value = '';
+      save();
+    }
+
+    // 刪除自訂分類
+    function deleteCustomCategory(categoryValue, btnElement) {
+      if (!confirm('確定要刪除此分類嗎？（已建立的待辦事項不會被刪除，但分類會保留原色）')) return;
+
+      // 1. 從下拉選單中移除該 option
+      const optionToRemove = categorySelect.querySelector(`option[value="${categoryValue}"]`);
+      if (optionToRemove) {
+        optionToRemove.remove();
+      }
+
+      // 2. 從管理面板中移除該標籤外觀
+      btnElement.parentElement.remove();
+
+      save();
+    }
 
     // 新增待辦事項
     function addTodo() {
       const text = todoInput.value.trim();
       if (!text) return alert('請輸入內容！');
 
-      const category = categorySelect.value;
-      const categoryText = category === 'personal' ? '個人' : '公司';
-      const tagClass = category === 'personal' ? 'tag-personal' : 'tag-work';
+      const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+      const categoryText = selectedOption.text;
+      const categoryColor = selectedOption.getAttribute('data-color') || '#3b82f6';
+      const categoryValue = categorySelect.value;
+      
+      const dueDate = dueDateInput.value; 
+      let dueDateHtml = '';
+      if (dueDate) {
+        const displayDate = dueDate.substring(5); 
+        dueDateHtml = `<span class="due-date-tag" data-date="${dueDate}">⏳ ${displayDate} 截止</span>`;
+      } else {
+        dueDateHtml = `<span class="due-date-tag"></span>`;
+      }
 
       const li = document.createElement('li');
       li.className = 'todo-item';
-      li.setAttribute('data-category', category);
+      li.setAttribute('data-category', categoryValue);
       li.setAttribute('data-status', 'active');
 
       li.innerHTML = `
         <input type="checkbox" onchange="toggleComplete(this)">
-        <span class="category-tag ${tagClass}">${categoryText}</span>
-        <span class="todo-text">${text}</span>
+        <span class="category-tag" style="background-color: ${categoryColor};">${categoryText}</span>
+        <span class="todo-text" ondblclick="editTodo(this)" title="雙擊可編輯文字">${text}</span>
+        ${dueDateHtml}
         <button class="delete-btn" onclick="deleteTodo(this)">✕</button>
       `;
 
       todoList.appendChild(li);
-      todoInput.value = ''; // 清空輸入框
+      todoInput.value = '';
+      dueDateInput.value = '';
       
-      // 根據當前篩選狀態決定是否隱藏新項目
       applyFilter();
+    }
+
+    // 雙擊編輯
+    function editTodo(textSpan) {
+      if (textSpan.parentElement.classList.contains('completed')) return;
+
+      const currentText = textSpan.innerText;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentText;
+      input.style.width = '50%'; 
+      input.style.fontSize = '15px';
+      input.style.padding = '4px 8px';
+
+      function finishEdit() {
+        const newText = input.value.trim();
+        if (newText) {
+          textSpan.innerText = newText;
+        } else {
+          textSpan.innerText = currentText;
+        }
+        input.replaceWith(textSpan);
+        save();
+      }
+
+      input.onblur = finishEdit;
+      input.onkeypress = function(e) {
+        if (e.key === 'Enter') finishEdit();
+      };
+
+      textSpan.replaceWith(input);
+      input.focus();
     }
 
     // 切換完成狀態
@@ -254,9 +500,11 @@
       if (checkbox.checked) {
         item.classList.add('completed');
         item.setAttribute('data-status', 'completed');
+        checkbox.setAttribute('checked', 'true');
       } else {
         item.classList.remove('completed');
         item.setAttribute('data-status', 'active');
+        checkbox.removeAttribute('checked');
       }
       applyFilter();
     }
@@ -264,11 +512,11 @@
     // 刪除項目
     function deleteTodo(button) {
       button.parentElement.remove();
+      save();
     }
 
-    // 點擊篩選標籤
+    // 篩選切換
     function filterTodo(status, btnElement) {
-      // 切換按鈕 active 樣式
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
       btnElement.classList.add('active');
       
@@ -276,28 +524,45 @@
       applyFilter();
     }
 
-    // 執行篩選邏輯
+    // 執行搜尋與篩選
     function applyFilter() {
       const items = document.querySelectorAll('.todo-item');
+      const keyword = searchInput.value.toLowerCase().trim();
+
       items.forEach(item => {
         const status = item.getAttribute('data-status');
+        const text = item.querySelector('.todo-text').innerText.toLowerCase();
         
-        if (currentFilter === 'all') {
-          item.style.display = 'flex';
-        } else if (currentFilter === 'active' && status === 'active') {
-          item.style.display = 'flex';
-        } else if (currentFilter === 'completed' && status === 'completed') {
+        let matchFilter = false;
+        if (currentFilter === 'all') matchFilter = true;
+        else if (currentFilter === 'active' && status === 'active') matchFilter = true;
+        else if (currentFilter === 'completed' && status === 'completed') matchFilter = true;
+
+        const matchSearch = text.includes(keyword);
+
+        if (matchFilter && matchSearch) {
           item.style.display = 'flex';
         } else {
           item.style.display = 'none';
         }
       });
+
+      checkDateUrgency();
+      save();
     }
 
-    // 支援按下 Enter 鍵新增
+    // 儲存所有 HTML 區塊到 LocalStorage
+    function save() {
+      localStorage.setItem('myTodoListHtml', todoList.innerHTML);
+      localStorage.setItem('myTodoCategoriesHtml', categorySelect.innerHTML);
+      localStorage.setItem('myCustomTagsListHtml', customTagsList.innerHTML); // 👈 多儲存管理清單的外觀
+    }
+
     todoInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') addTodo();
     });
+
+    checkDateUrgency();
   </script>
 </body>
 </html>
