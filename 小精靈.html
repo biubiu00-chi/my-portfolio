@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小精靈電流急急棒 - 雙關卡版</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            user-select: none;
+        }
+
+        #game-wrapper {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 5px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        #mazeCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* 上方提示資訊 */
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 8;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #level-title {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #hint-text {
+            color: #ffeb3b;
+            font-size: 16px;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #ffeb3b;
+            display: block;
+        }
+
+        #food {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: #ffeb3b;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #ffeb3b;
+            z-index: 10;
+            display: none;
+        }
+
+        #pacman-container {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .pacman {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background-color: #2196f3;
+            border-radius: 50%;
+            clip-path: polygon(100% 50%, 50% 50%, 100% 50%, 100% 0, 0 0, 0 100%, 100% 100%);
+            animation: chompSmooth 0.25s ease-in-out infinite alternate;
+        }
+
+        .eye {
+            position: absolute;
+            top: 8px;
+            left: 20px;
+            width: 8px;
+            height: 8px;
+            background-color: #ffb74d;
+            border-radius: 50%;
+            z-index: 6;
+        }
+
+        @keyframes chompSmooth {
+            0% { clip-path: polygon(100% 50%, 50% 50%, 100% 50%, 100% 0, 0 0, 0 100%, 100% 100%); }
+            100% { clip-path: polygon(100% 50%, 50% 50%, 100% 15%, 100% 0, 0 0, 0 100%, 100% 100%, 100% 85%); }
+        }
+
+        /* 遮罩面板 */
+        .game-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s;
+        }
+
+        .game-mask h1 { font-size: 64px; margin: 0 0 10px 0; }
+        .game-mask p { font-size: 24px; margin: 0 0 30px 0; }
+
+        #game-over-mask h1 { color: #f44336; text-shadow: 0 0 10px rgba(244,67,54,0.5); }
+        #game-win-mask h1 { color: #4caf50; text-shadow: 0 0 10px rgba(76,175,80,0.5); }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-restart { background-color: #2196f3; }
+        .btn-restart:hover { background-color: #1976d2; }
+        .btn-next { background-color: #4caf50; }
+        .btn-next:hover { background-color: #388e3c; }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <div id="info-panel">
+            <div id="level-title">第一關：小試身手</div>
+            <div id="hint-text">👉 請將滑鼠移到左上角【綠色起點】開始，走向終點吧!</div>
+        </div>
+        
+        <canvas id="mazeCanvas" width="800" height="600"></canvas>
+        <div id="food"></div>
+        <div id="pacman-container">
+            <div class="eye"></div>
+            <div class="pacman"></div>
+        </div>
+    </div>
+
+    <!-- GAME OVER 畫面 -->
+    <div id="game-over-mask" class="game-mask">
+        <h1>GAME OVER</h1>
+        <p id="death-reason">💥 撞到迷宮牆壁了！</p>
+        <button class="btn btn-restart" onclick="resetGame()">重新挑戰</button>
+    </div>
+
+    <!-- GAME WIN 畫面 -->
+    <div id="game-win-mask" class="game-mask">
+        <h1 id="win-title">VICTORY!</h1>
+        <p id="win-reason">🎉 恭喜通過第一關！準備好迎接終極挑戰了嗎？</p>
+        <button id="win-btn" class="btn btn-next" onclick="nextLevel()">進入下一關</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mazeCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const food = document.getElementById('food');
+        const pacman = document.getElementById('pacman-container');
+        const gameOverMask = document.getElementById('game-over-mask');
+        const gameWinMask = document.getElementById('game-win-mask');
+        const levelTitle = document.getElementById('level-title');
+        const hintText = document.getElementById('hint-text');
+        const deathReason = document.getElementById('death-reason');
+        const winTitle = document.getElementById('win-title');
+        const winReason = document.getElementById('win-reason');
+        const winBtn = document.getElementById('win-btn');
+
+        let currentLevel = 1; // 追蹤目前關卡：1 代表簡單，2 代表地獄
+        let isGameOver = false;
+        let isPlaying = false; 
+        
+        let mouseX = 50;
+        let mouseY = 50;
+        let pacmanX = 50;
+        let pacmanY = 50;
+        const ease = 0.07; // 第二關小精靈追逐速度
+
+        function drawMaze() {
+            ctx.fillStyle = '#f44336'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#222222'; 
+            ctx.lineWidth = 70;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(50, 50);     
+            ctx.lineTo(350, 50);    
+            ctx.lineTo(350, 250);   
+            ctx.lineTo(150, 250);   
+            ctx.lineTo(150, 500);   
+            ctx.lineTo(700, 500);   
+            ctx.lineTo(700, 150);   
+            ctx.lineTo(550, 150);   
+            ctx.lineTo(550, 350);   
+            ctx.stroke();
+
+            ctx.fillStyle = '#4caf50';
+            ctx.beginPath();
+            ctx.arc(50, 50, 30, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#00bcd4';
+            ctx.beginPath();
+            ctx.arc(550, 350, 25, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 初始化/重置當前關卡
+        function resetGame() {
+            isGameOver = false;
+            isPlaying = false; 
+            
+            gameOverMask.style.visibility = 'hidden';
+            gameOverMask.style.opacity = '0';
+            gameWinMask.style.visibility = 'hidden';
+            gameWinMask.style.opacity = '0';
+            
+            food.style.display = 'none'; 
+            canvas.style.cursor = 'default'; 
+
+            if (currentLevel === 1) {
+                levelTitle.innerText = "第一關：小試身手";
+                hintText.innerHTML = "👉 請將滑鼠移到左上角【綠色起點】開始，走向終點吧!";
+            } else {
+                levelTitle.innerText = "第二關：終極挑戰 🔥";
+                hintText.innerHTML = "⚠️ 警告：別走太慢！小精靈醒來要吃掉你了！";
+            }
+
+            // 小精靈重置回起點
+            pacmanX = 50;
+            pacmanY = 50;
+            pacman.style.transform = `translate(-50%, -50%) translate(50px, 50px) rotate(0deg)`;
+
+            drawMaze();
+        }
+
+        // 贏了之後前往下一關
+        function nextLevel() {
+            if (currentLevel === 1) {
+                currentLevel = 2;
+                resetGame();
+            } else {
+                // 如果第二關也贏了，重頭來過
+                currentLevel = 1;
+                resetGame();
+            }
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isGameOver) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const currentMouseX = e.clientX - rect.left;
+            const currentMouseY = e.clientY - rect.top;
+
+            if (!isPlaying) {
+                const distToStart = Math.hypot(currentMouseX - 50, currentMouseY - 50);
+                if (distToStart < 30) {
+                    isPlaying = true; 
+                    food.style.display = 'block';
+                    canvas.style.cursor = 'none'; 
+                    
+                    if (currentLevel === 2) {
+                        // 第二關開局時，小精靈從左方稍微退後，給玩家一點起跑反應時間
+                        pacmanX = 20;
+                        pacmanY = 50;
+                    }
+                } else {
+                    return; 
+                }
+            }
+
+            mouseX = currentMouseX;
+            mouseY = currentMouseY;
+
+            food.style.left = mouseX + 'px';
+            food.style.top = mouseY + 'px';
+
+            const pixel = ctx.getImageData(mouseX, mouseY, 1, 1).data;
+            const r = pixel[0];
+            const g = pixel[1];
+            const b = pixel[2];
+
+            if (r === 0 && g === 188 && b === 212) {
+                winGame();
+                return;
+            }
+
+            if (r > 200 && g < 100 && b < 100) {
+                failGame("💥 糟糕！撞到迷宮牆壁了！");
+            }
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            if (isPlaying && !isGameOver) failGame("👋 滑鼠不能逃離迷宮區域喔！");
+        });
+
+        function failGame(reason) {
+            isGameOver = true;
+            isPlaying = false;
+            deathReason.innerText = reason;
+            gameOverMask.style.visibility = 'visible';
+            gameOverMask.style.opacity = '1';
+        }
+
+        function winGame() {
+            isGameOver = true;
+            isPlaying = false;
+            
+            if (currentLevel === 1) {
+                winTitle.innerText = "LEVEL CLEAR!";
+                winReason.innerText = "🎉 恭喜通過第一關！準備好迎接終極挑戰了嗎？";
+                winBtn.innerText = "進入第二關 (終極挑戰)";
+                winBtn.className = "btn btn-next";
+            } else {
+                winTitle.innerText = "神級玩家！🏆";
+                winReason.innerText = "👑 太瘋狂了！你成功甩掉飢餓的小精靈，完成了終極挑戰！";
+                winBtn.innerText = "再挑戰一次";
+                winBtn.className = "btn btn-restart";
+            }
+            
+            gameWinMask.style.visibility = 'visible';
+            gameWinMask.style.opacity = '1';
+        }
+
+        function animate() {
+            if (isPlaying && !isGameOver) {
+                // 只有在【第二關】的時候，小精靈才會移動並觸發追逐碰撞偵測
+                if (currentLevel === 2) {
+                    pacmanX += (mouseX - pacmanX) * ease;
+                    pacmanY += (mouseY - pacmanY) * ease;
+
+                    const angleX = mouseX - pacmanX;
+                    const angleY = mouseY - pacmanY;
+                    let angle = Math.atan2(angleY, angleX) * (180 / Math.PI);
+
+                    pacman.style.transform = `translate(-50%, -50%) translate(${pacmanX}px, ${pacmanY}px) rotate(${angle}deg)`;
+
+                    // 被吃掉的距離偵測
+                    const distance = Math.hypot(mouseX - pacmanX, mouseY - pacmanY);
+                    if (distance < 20) {
+                        failGame("😱 走太慢了！食物被小精靈追上吃掉了！");
+                    }
+                } else {
+                    // 第一關：小精靈待在起點不動，嘴巴正常咬合，面朝右邊
+                    pacman.style.transform = `translate(-50%, -50%) translate(50px, 50px) rotate(0deg)`;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        resetGame();
+        animate();
+    </script>
+</body>
+</html>
