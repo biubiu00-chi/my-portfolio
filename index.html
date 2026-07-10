@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>首頁</title>
+    <title>張雅琪 | 個人作品集</title>
 
     <style>
         * {
@@ -13,19 +14,14 @@
         }
 
         body {
-            /* margin: 0; */
-            background-color: rgb(209, 243, 255);
-            padding: 10px;
-            font-family: monospace, 黑圓體;
+            background-color: rgb(8, 103, 136);
+            font-family: 'Sarasa Mono TC', 'Microsoft YaHei', monospace;
         }
 
-        a {
-            font-size: 20px;
-        }
-
-        img {
+        #me {
             width: 350px;
             height: 400px;
+            object-fit: cover;
         }
 
         #name {
@@ -37,79 +33,124 @@
             display: flex;
             flex: 1;
             justify-content: end;
-            gap: 30px;
+            gap: 40px;
         }
 
-        .portfolio {
-            font-size: 80px;
+        @media (min-width: 768px) {
+            .nav-right {
+                gap: 100px;
+            }
+        }
+
+        nav span:hover {
+            border-bottom: 2px solid #FFFFFF;
+        }
+
+        a:focus {
+            outline: 3px dotted #FFFFFF;
+            outline-offset: 5px;
+        }
+
+        h1 {
+            color: #0000;
+            margin: 0;
+            font-size: 90px;
+            font-family: impact, arial-black, sans-serif;
+            paint-order: stroke;
+            letter-spacing: 30px;
+        }
+
+        h1:nth-child(1) {
+            -webkit-text-stroke: 2px rgb(221, 28, 26);
+        }
+
+        h1:nth-child(2) {
+            -webkit-text-stroke: 3px rgb(7, 160, 195);
+        }
+
+        h1:nth-child(3) {
+            -webkit-text-stroke: 5px rgb(7, 160, 195);
+        }
+
+        h1:nth-child(4) {
+            -webkit-text-stroke: 2px rgb(7, 160, 195);
         }
 
         .imformation {
             font-size: 40px;
         }
 
+        .first {
+            color: rgb(240, 200, 8);
+            z-index: 99;
+        }
 
-        /* ============學歷============= */
-        /* 整個時間軸的外層，負責畫出左邊的垂直長線 */
+        /* ============ 學歷與經歷時間軸 ============= */
         .timeline {
             position: relative;
             padding-left: 35px;
-            /* 給左側的星星與連線留出空間 */
             margin-top: 20px;
         }
 
-        /* 畫出貫穿整條時間軸的細線 */
         .timeline::before {
             content: '';
             position: absolute;
             left: 10px;
-            /* 線條的位置，要跟星星對齊 */
             top: 10px;
             bottom: 10px;
             width: 2px;
-            background-color: rgb(31, 8, 161);
-            /* 線條顏色（可依背景調整） */
+            background-color: #07A0C3;
         }
 
-        /* 每一筆學歷項目的排列 */
         .timeline-item {
             position: relative;
             display: flex;
+            flex-direction: column;
             margin-bottom: 40px;
-            /* 兩筆學歷之間的上下間距 */
+        }
+
+        @media (min-width: 640px) {
+            .timeline-item {
+                flex-direction: row;
+            }
         }
 
         .timeline-item:last-child {
             margin-bottom: 0;
-            /* 最後一筆不需要底部間距 */
         }
 
-        /* 💡 核心：在每筆學歷的左邊線上，精確塞入一顆星星 */
         .timeline-item::after {
             content: '✦';
-            /* 閃亮四角星 */
             position: absolute;
             left: -36px;
-            /* 精確對齊左邊細線 */
-            top: -10px;
-            /* 微調星星的上下高度 */
-            color: #f9785b;
-            /* 星星顏色（可以換成你作品集的主題色） */
+            top: -12px;
+            color: #DD1C1A;
             font-size: 30px;
-            /* 建議加上你網頁的背景色，把星星後面的線條遮掉，會更好看 */
-            padding: 2px 0;
+            padding: 2px 4px;
         }
 
-        /* 年份的寬度與樣式 */
+        /* 運用背景色遮掉星星後面的線條 */
+        .bg-blue-timeline .timeline-item::after {
+            background-color: rgb(8, 103, 136);
+        }
+
+        .bg-yellow-timeline .timeline-item::after {
+            background-color: #F0C808;
+        }
+
         .time-node {
             font-weight: bold;
             width: 160px;
-            /* 固定寬度，這樣右邊的學校名稱才會對齊 */
             flex-shrink: 0;
-            /* 防止年份因為擠壓而換行 */
+            margin-bottom: 4px;
         }
 
-        /* 學校與科系 */
+        @media (min-width: 640px) {
+            .time-node {
+                margin-bottom: 0;
+            }
+        }
+
         .time-content h3 {
             margin: 0 0 4px 0;
             font-size: 1.25rem;
@@ -118,170 +159,274 @@
 
         .time-content p {
             margin: 0;
-            opacity: 0.8;
-            /* 讓科系名稱顏色稍微淡一點，比較有層次感 */
+            opacity: 0.9;
         }
     </style>
 </head>
 
 <body>
-    <nav class="flex mb-30">
+    <nav class="flex flex-col sm:flex-row items-center justify-between mb-20 p-8 text-white gap-4">
         <div id="name" class="text-3xl font-bold">張雅琪</div>
         <div class="nav-right">
-            <div class="work"><a href="">Work</a></div>
-            <div class="about"><a href="">About me</a></div>
-            <div class="skills"><a href="">Skills</a></div>
+            <div class="text-xl sm:text-2xl"><a href="#about"><span>About me</span></a></div>
+            <div class="text-xl sm:text-2xl"><a href="#skill"><span>Skills</span></a></div>
+            <div class="text-xl sm:text-2xl"><a href="#experience"><span>Experience</span></a></div>
         </div>
     </nav>
-    <section class="flex justify-center items-center">
-        <img src="./img/個人照.jpg">
-        <div class="portfolio">
-            <div>PORTFOLIO</div>
-            <div>PORTFOLIO</div>
-            <div>PORTFOLIO</div>
-            <div>PORTFOLIO</div>
-        </div>
-        <div class="w-4xs h-24 bg-teal-900 p-3">
-            <div>Nickname : 牙～</div>
-            <div>IG : chi_25orz</div>
-            <div>Gmil : as8951810@gmail.com</div>
+
+    <section class="w-full flex justify-center items-center mb-24 px-6 overflow-hidden">
+        <div class="relative w-full max-w-[1100px] h-[500px] flex items-center">
+            <div class="absolute left-0 top-12 text-[#F0C808] text-4xl animate-pulse hidden md:block">✦</div>
+            <div class="absolute left-8 top-24 text-[#F0C808] text-2xl animate-pulse hidden md:block">✦</div>
+            <div class="w-full font-black pointer-events-none flex flex-col justify-between h-full py-4 select-none">
+                <h1 class="first relative z-30 tracking-[10px] md:tracking-[25px] text-center">PORTFOLIO</h1>
+                <h1 class="relative z-0 tracking-[10px] md:tracking-[25px] text-center">PORTFOLIO</h1>
+                <h1 class="relative z-0 tracking-[10px] md:tracking-[25px] text-center">PORTFOLIO</h1>
+                <h1 class="relative z-0 tracking-[10px] md:tracking-[25px] text-center">PORTFOLIO</h1>
+            </div>
+            <div class="absolute left-[20px] md:left-[50px] top-[75px] z-10">
+                <img id="me" class="rounded-2xl object-cover" src="./img/個人照.jpg" alt="個人照">
+            </div>
+            <div
+                class="absolute right-[20px] md:right-[50px] top-[180px] w-[260px] h-fit bg-[#F0C808] text-xl p-6 z-40 text-[#DD1C1A] font-bold content-center leading-[2] rounded-2xl shadow-lg">
+                <div>Nickname : 牙～</div>
+                <div>Birthday : 88/12/17</div>
+                <div>IG : chi_25orz</div>
+            </div>
+            <div class="absolute right-4 bottom-12 text-[#F0C808] text-3xl animate-pulse hidden md:block">✦</div>
         </div>
     </section>
-    <section class="flex justify-around items-center mb-30">
-        <div>
-            <div class="text-5xl">Hello,</br> I'm YaChi!</div>
-            <div class="w-xs">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sed est odit, blanditiis incidunt magni,
-                inventore labore iste atque eius nobis eligendi ipsa aperiam assumenda placeat perspiciatis officia,
-                quasi adipisci magnam.
+
+    <section id="about" class="flex flex-col md:flex-row justify-around items-center mb-24 bg-[#FFF1D0] p-8 md:p-16 gap-10">
+        <div class="max-w-xl">
+            <span class="text-[#07A0C3] text-2xl mr-2">✦</span>
+            <div class="text-5xl md:text-7xl text-[#07A0C3] font-bold mb-6">Hello,<br>I'm YaChi!</div>
+            <div class="text-lg text-gray-800 leading-relaxed">
+                運動事業管理碩士背景，跨域投入網頁前端與 UI/UX 設計。具備 3 年以上的團隊協作與危機處理經驗，善於從使用者角度出發打造吸睛且實用的數位體驗。目前正於職訓中心精進 Figma、Vue.js
+                等前端實務技能。
             </div>
         </div>
-        <div class="w-xs bg-teal-800 p-3">
-            <img src="./img/個人照.jpg">
-            <div class="imformation">Contact
-                <div class="text-base"><i class="fa-solid fa-location-dot"></i>台中市</div>
-                <div class="text-base"><i class="fa-solid fa-phone"></i>連絡電話:0919861361</div>
+       <div class="relative w-72 h-[340px] bg-transparent mt-12 md:mt-0 flex flex-col justify-end overflow-visible">
+            
+            <!-- A. 後方有色底圖框（內含圓形白色剪影背景） -->
+            <div class="absolute inset-x-0 bottom-0 h-72 bg-emerald-800 rounded-2xl shadow-xl overflow-hidden flex items-center justify-center">
+                <!-- 內層白色圓形（模擬設計圖背景月亮） -->
+                <div class="w-48 h-48 bg-white/20 rounded-full absolute top-8"></div>
             </div>
-        </div>
-    </section>
-    <section class="flex justify-around">
-        <div class="flex-col">
-            <div class="text-5xl font-bold mb-10">Education</div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="time-node">2026/4 ~ 2026/8</div>
-                    <div class="time-content">
-                        <h3>職訓中心培訓班</h3>
-                        <p>Figma UIUX與Vue.js前端培訓班</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="time-node">2022/9 ~ 2024/6</div>
-                    <div class="time-content">
-                        <h3>國立臺灣體育運動大學</h3>
-                        <p>運動事業管理學系 碩士班</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="time-node">2018/9 ~ 2022/6</div>
-                    <div class="time-content">
-                        <h3>國立臺灣體育運動大學</h3>
-                        <p>運動事業管理學系</p>
-                    </div>
-                </div>
 
+            <!-- B. 前方去背人像照（你挑好照片後把這裡改成你的「去背個人照.png」） -->
+            <!-- 關鍵類別：absolute 抽出來，h-[400px] 故意設定比底框還高，並且用 -top-20 讓他往上衝出框框！ -->
+            <img src="./img/97F44AB1-EBC9-4177-8206-C07354C1DA44-removebg-preview.png" class="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-[380px] object-cover z-20 overflow-visible" alt="去背個人照預留區">
+
+            <!-- C. 浮在半空中的標籤插圖 (膠囊型態) -->
+            <div class="absolute top-16 -left-6 bg-[#F0C808] text-[#DD1C1A] text-xs font-bold px-3 py-1 rounded-full shadow-md z-30 transform -rotate-6">
+                1999/12/17
             </div>
-        </div>
-
-        <div class="flex flex-col h-full gap-8 p-6 text-white bg-[#7f9fff]">
-            <div class="text-5xl font-bold text-[#ff9100] tracking-wide">Technical skills</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 w-full">
-                <div class="flex flex-col gap-4">
-                    <h3 class="text-3xl font-bold font-serif">Skills</h3>
-                    <p class="text-gray-300 italic">Basic knowledge of:</p>
-                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 max-w-[280px]">
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                            <img src="./img/figma.png" class="w-10 h-10 object-contain">
-                        </div>
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                            <img src="./img/vscode.jpg" class="w-10 h-10 object-contain">
-                        </div>
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                            <img src="./img/html.png" class="w-10 h-10 object-contain">
-                        </div>
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                            <img src="./img/css.png" class="w-10 h-10 object-contain">
-                        </div>
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                            <img src="./img/js.jpg" class="w-10 h-10 object-contain">
-                        </div>
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                            <img src="./img/vue.png" class="w-10 h-10 object-contain">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-4">
-                    <h3 class="text-3xl font-bold font-serif">My Works</h3>
-                    <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-xl font-medium max-w-[300px]">
-                        <div><a href="ToDoList02.html">To-Do-List</a></div>
-                        <div><a href="寶可夢圖鑑plus.html">寶可夢圖鑑</a></div>
-                        <div><a href="小精靈.html">小精靈小遊戲</a></div>
-                    </div>
-                </div>
+            <div class="absolute top-36 -right-6 bg-[#07A0C3] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-30 transform rotate-6">
+                Taichung
             </div>
-            <div class="flex flex-wrap gap-3 mt-4">
-                <span
-                    class="px-6 py-3 bg-black text-white rounded-full text-base font-medium tracking-wide shadow-sm">Git</span>
-                <span
-                    class="px-6 py-3 bg-black text-white rounded-full text-base font-medium tracking-wide shadow-sm">Sass</span>
-                <span
-                    class="px-6 py-3 bg-black text-white rounded-full text-base font-medium tracking-wide shadow-sm">UI/UX</span>
-                <span
-                    class="px-6 py-3 bg-black text-white rounded-full text-base font-medium tracking-wide shadow-sm">Github</span>
-                <span
-                    class="px-6 py-3 bg-black text-white rounded-full text-base font-medium tracking-wide shadow-sm">RWD響應式</span>
-                <span
-                    class="px-6 py-3 bg-black text-white rounded-full text-base font-medium tracking-wide shadow-sm">Flexbox</span>
+
+            <!-- D. 最前方的聯絡資訊小黑框 -->
+            <div class="absolute -bottom-6 inset-x-4 bg-gray-950 text-white p-4 rounded-xl shadow-2xl z-40 text-center border border-white/10">
+                <div class="font-black text-lg mb-1 tracking-wider" style="font-family: Impact;">CONTACT</div>
+                <div class="text-xs text-gray-400 mb-1"><i class="fa-solid fa-phone mr-1 text-[#F0C808]"></i> 0919861361</div>
+                <div class="text-xs text-gray-400"><i class="fa-solid fa-envelope mr-1 text-[#F0C808]"></i> as8951810@gmail.com</div>
             </div>
         </div>
     </section>
-    <div class="flex flex-col w-2/5 h-full ml-26 gap-8 p-6 text-white bg-[#7f9fff]">
-        <div class="text-5xl font-bold text-[#ff9100] tracking-wide">Experience</div>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="time-node">2023/2 ~ 2026/3<br>3年2個月</div>
-                <div class="time-content">
-                    <h3>飯飯燒肉專門店<br>內場/外場服務人員</h3>
-                    <p>除了工作內容外，如果店長不在：<br>1.擔任新人輔導員，負責教導新人
-                        <br>2.單日營業結帳<br>3.主掌店內大小事，危機處理等等
-                    </p>
+
+    <section class="flex flex-col xl:flex-row justify-around px-6 md:px-16 gap-12 mb-24">
+        <div class="flex flex-col w-full xl:w-1/2 gap-12">
+            <div class="p-2">
+                <div class="text-5xl font-bold mb-8 text-[#FFF1D0]">Education</div>
+                <div class="timeline text-white bg-blue-timeline">
+                    <div class="timeline-item">
+                        <div class="time-node">2026/4 ~ 2026/8</div>
+                        <div class="time-content">
+                            <h3>職訓中心培訓班</h3>
+                            <p class="text-blue-100">Figma UIUX與Vue.js前端培訓班</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time-node">2022/9 ~ 2024/6</div>
+                        <div class="time-content">
+                            <h3>國立臺灣體育運動大學</h3>
+                            <p class="text-blue-100">運動事業管理學系 碩士班</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time-node">2018/9 ~ 2022/6</div>
+                        <div class="time-content">
+                            <h3>國立臺灣體育運動大學</h3>
+                            <p class="text-blue-100">運動事業管理學系</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="timeline-item">
-                <div class="time-node">2022/9 ~ 2024/8<br>2年</div>
-                <div class="time-content">
-                    <h3>國立臺灣體育運動大學<br>系辦助教工讀生</h3>
-                    <p>協助助教行政作業、送公文</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="time-node">2022/6 ~ 2022/9<br>4個月</div>
-                <div class="time-content">
-                    <h3>全真概念健康事業股份有限公司<br>行政櫃台</h3>
-                    <p>接待會員、早班負責開店準備、參加百貨早會、館內廣播提醒、會員秩序管理、第一線處理客服來電</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="time-node">2022/6 ~ 2022/9<br>4個月</div>
-                <div class="time-content">
-                    <h3>全家便利商店股份有限公司<br>門市人員</h3>
-                    <p>櫃檯收銀、商品上架/陳列/報廢</p>
+
+            <div id="experience" class="flex flex-col h-fit gap-8 p-6 bg-[#F0C808] rounded-2xl shadow-lg text-gray-900">
+                <div class="text-5xl font-bold text-[#DD1C1A] tracking-wide">Experience</div>
+                <div class="timeline bg-yellow-timeline">
+                    <div class="timeline-item">
+                        <div class="time-node text-[#DD1C1A]">2023/2 ~ 2026/3<br class="hidden sm:inline"><span
+                                class="text-sm font-normal text-gray-700">(3年2個月)</span></div>
+                        <div class="time-content">
+                            <h3 class="font-bold">飯飯燒肉專門店 | 內外場服務人員</h3>
+                            <p class="mt-2 text-gray-800">
+                                擔任新人輔導員負責培訓、單日營業結帳、店內危機處理與日常營運管理。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time-node text-[#DD1C1A]">2022/9 ~ 2024/8<br class="hidden sm:inline"><span
+                                class="text-sm font-normal text-gray-700">(2年)</span></div>
+                        <div class="time-content">
+                            <h3 class="font-bold">國立臺灣體育運動大學 | 系辦助教工讀生</h3>
+                            <p class="mt-1 text-gray-800">協助助教行政作業與公文遞送。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time-node text-[#DD1C1A]">2022/6 ~ 2022/9<br class="hidden sm:inline"><span
+                                class="text-sm font-normal text-gray-700">(4個月)</span></div>
+                        <div class="time-content">
+                            <h3 class="font-bold">全真概念健康事業 | 行政櫃台</h3>
+                            <p class="mt-1 text-gray-800">會員接待、開店準備、百貨早會、館內廣播與第一線客訴電話處理。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="time-node text-[#DD1C1A]">2022/6 ~ 2022/9<br class="hidden sm:inline"><span
+                                class="text-sm font-normal text-gray-700">(4個月)</span></div>
+                        <div class="time-content">
+                            <h3 class="font-bold">全家便利商店 | 門市人員</h3>
+                            <p class="mt-1 text-gray-800">櫃檯收銀、商品進貨上架、陳列與報廢日常維護。</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
+        <div id="skill" class="flex flex-col w-full xl:w-1/2 gap-12 text-white">
+            <div class="p-2">
+                <div class="text-5xl font-bold text-[#FFF1D0] tracking-wide mb-8">Technical Skills</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 w-full">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-3xl font-bold text-[#F0C808]">Skills</h3>
+                        <p class="text-gray-300 italic text-sm">Basic knowledge of:</p>
+                        <div class="grid grid-cols-3 gap-4 max-w-[280px]">
+                            <div
+                                class="w-16 h-16 bg-[#FFF1D0] rounded-2xl flex items-center justify-center shadow-md hover:scale-105 transition-transform">
+                                <img src="./img/figma.png" class="w-12 h-12 object-contain" alt="Figma"></div>
+                            <div
+                                class="w-16 h-16 bg-[#FFF1D0] rounded-2xl flex items-center justify-center shadow-md hover:scale-105 transition-transform">
+                                <img src="./img/vscode.png" class="w-10 h-10 object-contain" alt="VSCode"></div>
+                            <div
+                                class="w-16 h-16 bg-[#FFF1D0] rounded-2xl flex items-center justify-center shadow-md hover:scale-105 transition-transform">
+                                <img src="./img/html.png" class="w-10 h-10 object-contain" alt="HTML"></div>
+                            <div
+                                class="w-16 h-16 bg-[#FFF1D0] rounded-2xl flex items-center justify-center shadow-md hover:scale-105 transition-transform">
+                                <img src="./img/css.png" class="w-11 h-11 object-contain" alt="CSS"></div>
+                            <div
+                                class="w-16 h-16 bg-[#FFF1D0] rounded-2xl flex items-center justify-center shadow-md hover:scale-105 transition-transform">
+                                <img src="./img/js.png" class="w-10 h-10 object-contain" alt="JS"></div>
+                            <div
+                                class="w-16 h-16 bg-[#FFF1D0] rounded-2xl flex items-center justify-center shadow-md hover:scale-105 transition-transform">
+                                <img src="./img/vue.png" class="w-12 h-12 object-contain" alt="Vue"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-3xl font-bold text-[#F0C808]">My Works</h3>
+                        <ul class="text-xl font-medium max-w-[300px] leading-[2.5] list-disc list-inside">
+                            <li><a href="ToDoList02.html" class="hover:text-[#F0C808] transition-colors">To-Do-List</a>
+                            </li>
+                            <li><a href="寶可夢圖鑑plus.html" class="hover:text-[#F0C808] transition-colors">寶可夢圖鑑</a></li>
+                            <li><a href="小精靈.html" class="hover:text-[#F0C808] transition-colors">小精靈小遊戲</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mt-8">
+                    <span
+                        class="px-4 py-2 bg-[#07A0C3] text-white rounded-full text-sm font-medium shadow-sm">Git</span>
+                    <span
+                        class="px-4 py-2 bg-[#07A0C3] text-white rounded-full text-sm font-medium shadow-sm">Sass</span>
+                    <span
+                        class="px-4 py-2 bg-[#07A0C3] text-white rounded-full text-sm font-medium shadow-sm">UI/UX</span>
+                    <span
+                        class="px-4 py-2 bg-[#07A0C3] text-white rounded-full text-sm font-medium shadow-sm">Github</span>
+                    <span class="px-4 py-2 bg-[#07A0C3] text-white rounded-full text-sm font-medium shadow-sm">RWD
+                        響應式</span>
+                    <span
+                        class="px-4 py-2 bg-[#07A0C3] text-white rounded-full text-sm font-medium shadow-sm">Flexbox</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-6 p-2">
+                <div class="text-5xl font-bold text-[#FFF1D0] tracking-wide">Hobbies & Interests</div>
+                <div class="flex flex-wrap gap-4">
+                    <div
+                        class="w-28 h-28 bg-[#07A0C3] rounded-2xl flex flex-col shadow-md p-3 justify-center items-center hover:rotate-3 transition-transform">
+                        <img src="./img/vb-removebg-preview.png" class="w-12 h-12 object-contain mb-1" alt="排球">
+                        <div class="text-xs font-bold text-white text-center">Volleyball</div>
+                    </div>
+                    <div
+                        class="w-28 h-28 bg-[#07A0C3] rounded-2xl flex flex-col shadow-md p-3 justify-center items-center hover:-rotate-3 transition-transform">
+                        <img src="./img/槓.png" class="w-12 h-12 object-contain mb-1" alt="健身">
+                        <div class="text-xs font-bold text-white text-center">Fitness</div>
+                    </div>
+                    <div
+                        class="w-28 h-28 bg-[#07A0C3] rounded-2xl flex flex-col shadow-md p-3 justify-center items-center hover:rotate-3 transition-transform">
+                        <img src="./img/travel.png" class="w-12 h-12 object-contain mb-1" alt="旅遊">
+                        <div class="text-xs font-bold text-white text-center">Travel</div>
+                    </div>
+                    <div
+                        class="w-28 h-28 bg-[#07A0C3] rounded-2xl flex flex-col shadow-md p-3 justify-center items-center hover:-rotate-3 transition-transform">
+                        <img src="./img/cooking.png" class="w-12 h-12 object-contain mb-1" alt="烹飪">
+                        <div class="text-xs font-bold text-white text-center">Cooking</div>
+                    </div>
+                    <div
+                        class="w-28 h-28 bg-[#07A0C3] rounded-2xl flex flex-col shadow-md p-3 justify-center items-center hover:rotate-3 transition-transform">
+                        <img src="./img/K-pop.png" class="w-12 h-12 object-contain mb-1" alt="舞蹈">
+                        <div class="text-xs font-bold text-white text-center">Dancing</div>
+                    </div>
+                </div>
+
+                <div class="flex items-end gap-8 mt-6">
+                    
+                    <!-- 狗派：故意縮小、變淡，當作陪襯 -->
+                    <div class="text-center text-sm text-white/50 font-medium transition-all hover:opacity-80">
+                        <div class="mb-1">狗派 (還好)</div>
+                        <div class="relative w-36 h-36 grayscale opacity-40 rounded-xl overflow-hidden border border-white/20">
+                            <img class="w-full h-full object-cover" src="./img/dog.png" alt="狗">
+                        </div>
+                    </div>
+
+                    <!-- 貓派：放大、加上閃亮特效與絕對領域標籤 -->
+                    <div class="text-center text-lg text-white font-black relative group">
+                        
+                        <!-- 貓派專屬小裝飾 -->
+                        <div class="absolute -top-5 -right-3 text-[#F0C808] text-xl animate-bounce">🐾</div>
+                        <div class="absolute -top-2 -left-4 text-[#07A0C3] text-lg">✦</div>
+                        
+                        <div class="mb-1 text-[#F0C808] flex items-center justify-center gap-1">
+                            貓派 <span class="text-xs bg-[#DD1C1A] text-white px-1.5 py-0.5 rounded animate-pulse">MAIN!</span>
+                        </div>
+                        
+                        <!-- 貓咪主圖：加大尺寸、亮眼邊框、滑鼠懸停放大 -->
+                        <div class="relative w-36 h-36 rounded-2xl overflow-hidden border-4 border-[#F0C808] shadow-2xl transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
+                            <img class="w-full h-full object-cover" src="./img/cat.png" alt="貓">
+                            
+                            <!-- 壓在照片上的 Y2K 復古小標籤 -->
+                            <div class="absolute bottom-2 inset-x-2 bg-black/70 backdrop-blur-xs text-white text-[10px] py-1 rounded-md tracking-widest font-bold">
+                                MEOW LOVER
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>
