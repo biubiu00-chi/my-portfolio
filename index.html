@@ -129,7 +129,6 @@
             padding: 2px 4px;
         }
 
-        /* 運用背景色遮掉星星後面的線條 */
         .bg-blue-timeline .timeline-item::after {
             background-color: rgb(8, 103, 136);
         }
@@ -210,15 +209,13 @@
             
             <!-- A. 後方有色底圖框（內含圓形白色剪影背景） -->
             <div class="absolute inset-x-0 bottom-0 h-72 bg-emerald-800 rounded-2xl shadow-xl overflow-hidden flex items-center justify-center">
-                <!-- 內層白色圓形（模擬設計圖背景月亮） -->
                 <div class="w-48 h-48 bg-white/20 rounded-full absolute top-8"></div>
             </div>
 
-            <!-- B. 前方去背人像照（你挑好照片後把這裡改成你的「去背個人照.png」） -->
-            <!-- 關鍵類別：absolute 抽出來，h-[400px] 故意設定比底框還高，並且用 -top-20 讓他往上衝出框框！ -->
+            <!-- B. 去背人像照-->
             <img src="./img/me.png" class="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-[380px] object-cover z-20 overflow-visible" alt="去背個人照預留區">
 
-            <!-- C. 浮在半空中的標籤插圖 (膠囊型態) -->
+            <!-- C. 浮在半空中的標籤插圖 -->
             <div class="absolute top-16 -left-6 bg-[#F0C808] text-[#DD1C1A] text-xs font-bold px-3 py-1 rounded-full shadow-md z-30 transform -rotate-6">
                 1999/12/17
             </div>
@@ -341,6 +338,7 @@
                             </li>
                             <li><a href="寶可夢圖鑑plus.html" class="hover:text-[#F0C808] transition-colors">寶可夢圖鑑</a></li>
                             <li><a href="小精靈.html" class="hover:text-[#F0C808] transition-colors">小精靈小遊戲</a></li>
+                            <li><a href="RWD.html" class="hover:text-[#F0C808] transition-colors">網頁切版</a></li>
                         </ul>
                     </div>
                 </div>
@@ -392,8 +390,6 @@
                 </div>
 
                 <div class="flex items-end gap-8 mt-6">
-                    
-                    <!-- 狗派：故意縮小、變淡，當作陪襯 -->
                     <div class="text-center text-sm text-white/50 font-medium transition-all hover:opacity-80">
                         <div class="mb-1">狗派 (還好)</div>
                         <div class="relative w-36 h-36 grayscale opacity-40 rounded-xl overflow-hidden border border-white/20">
@@ -401,22 +397,18 @@
                         </div>
                     </div>
 
-                    <!-- 貓派：放大、加上閃亮特效與絕對領域標籤 -->
                     <div class="text-center text-lg text-white font-black relative group">
-                        
-                        <!-- 貓派專屬小裝飾 -->
+                    
                         <div class="absolute -top-5 -right-3 text-[#F0C808] text-xl animate-bounce">🐾</div>
                         <div class="absolute -top-2 -left-4 text-[#07A0C3] text-lg">✦</div>
                         
                         <div class="mb-1 text-[#F0C808] flex items-center justify-center gap-1">
                             貓派 <span class="text-xs bg-[#DD1C1A] text-white px-1.5 py-0.5 rounded animate-pulse">MAIN!</span>
                         </div>
-                        
-                        <!-- 貓咪主圖：加大尺寸、亮眼邊框、滑鼠懸停放大 -->
+                       
                         <div class="relative w-36 h-36 rounded-2xl overflow-hidden border-4 border-[#F0C808] shadow-2xl transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
                             <img class="w-full h-full object-cover" src="./img/cat.png" alt="貓">
-                            
-                            <!-- 壓在照片上的 Y2K 復古小標籤 -->
+                       
                             <div class="absolute bottom-2 inset-x-2 bg-black/70 backdrop-blur-xs text-white text-[10px] py-1 rounded-md tracking-widest font-bold">
                                 MEOW LOVER
                             </div>
